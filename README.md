@@ -20,6 +20,16 @@ npm run test:browser   # 37 項瀏覽器實測（headless Chrome，會存截圖�
 > 只要在 GitHub 的 Settings → Pages 把 Source 指到 `gh-pages` /`(root)`，
 > 就會在 <https://morattiyau-ctrlww.github.io/sailor/> 上線。
 
+三次連拍：你的回合 → 結算鎖定 → 敵人的回合（都是 headless Chrome 實測截圖）
+
+| ① 你的回合 | ② 刀光劍影（按鍵鎖定） | ③ 敵人的回合 |
+| --- | --- | --- |
+| ![你的回合](docs/your-turn.jpg) | ![結算中](docs/resolving.jpg) | ![敵人的回合](docs/enemy-turn.jpg) |
+
+| 開場 | 分出勝負 | 手機版（390×844） |
+| --- | --- | --- |
+| ![開場](docs/start.jpg) | ![勝利](docs/victory.jpg) | ![手機](docs/phone.jpg) |
+
 ---
 
 ## 玩法
