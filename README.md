@@ -16,6 +16,10 @@ npm test               # 59 個純邏輯/音效測試（Node，不需要瀏覽�
 npm run test:browser   # 37 項瀏覽器實測（headless Chrome，會存截圖）
 ```
 
+> **線上版**：`gh-pages` 分支已放好打包好的成品（相對路徑，可掛在 `/sailor/` 之下）。
+> 只要在 GitHub 的 Settings → Pages 把 Source 指到 `gh-pages` /`(root)`，
+> 就會在 <https://morattiyau-ctrlww.github.io/sailor/> 上線。
+
 ---
 
 ## 玩法
