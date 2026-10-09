@@ -7,7 +7,7 @@
    attack, watch the plates vanish while the blow resolves, then click a guard
    — counting what is on screen at each step, with a screenshot each time.
 
-   usage: node tests/browser.mjs [dev|dist] [outDir]
+   usage: node tests/browser.mjs [dev|dist|<url>] [outDir]
    ========================================================================= */
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -17,21 +17,26 @@ import { extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const SERVE = process.argv[2] === 'dev' ? ROOT : join(ROOT, 'dist');
+const ARG = process.argv[2];
+/* 'dev' serves the source tree, 'dist' (the default) serves the build, and a
+   full http(s) URL checks a published copy instead of a local one — that is how
+   the GitHub Pages deployment gets the same checks as the working tree. */
+const REMOTE = /^https?:\/\//.test(ARG || '') ? ARG.replace(/\/+$/, '/') : null;
+const SERVE = ARG === 'dev' ? ROOT : join(ROOT, 'dist');
 const OUT = process.argv[3] || '/tmp/sailor';
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 mkdirSync(OUT, { recursive: true });
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.json': 'application/json' };
-const server = createServer((req, res) => {
+const server = REMOTE ? null : createServer((req, res) => {
   const p = decodeURIComponent((req.url || '/').split('?')[0]);
   const file = join(SERVE, p === '/' ? 'index.html' : p);
   if (!existsSync(file)) { res.writeHead(404); res.end('no'); return; }
   res.writeHead(200, { 'content-type': MIME[extname(file)] || 'application/octet-stream' });
   res.end(readFileSync(file));
 });
-await new Promise((r) => server.listen(0, '127.0.0.1', r));
-const PORT = server.address().port;
+if (server) await new Promise((r) => server.listen(0, '127.0.0.1', r));
+const PAGE = REMOTE || `http://127.0.0.1:${server.address().port}/index.html`;
 
 const DP = 9700 + Math.floor(Math.random() * 200);
 const profile = mkdtempSync(join(tmpdir(), 'sailor-check-'));
@@ -40,7 +45,7 @@ const chrome = spawn(CHROME, ['--headless=new', '--no-sandbox', '--enable-unsafe
   `--user-data-dir=${profile}`, '--window-size=1280,760', `--remote-debugging-port=${DP}`, 'about:blank'],
   { stdio: 'ignore' });
 const kill = () => { try { chrome.kill('SIGKILL'); } catch { /* gone */ } };
-process.on('exit', () => { kill(); server.close(); });
+process.on('exit', () => { kill(); server?.close(); });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function getJson(path) {
@@ -65,7 +70,12 @@ ws.addEventListener('message', (ev) => {
     problems.push('console.error: ' + (m.params.args || []).map((a) => a.value ?? a.description ?? '').join(' ').slice(0, 160));
   }
   if (m.method === 'Log.entryAdded' && m.params?.entry?.level === 'error') {
-    problems.push('log: ' + String(m.params.entry.text).slice(0, 160));
+    const text = String(m.params.entry.text);
+    /* A published copy fetches its recordings from public CDNs. A blocked or
+       slow sample is not a bug in the game — every cue keeps a synthesised
+       fallback — so against a remote target only real JS errors count. */
+    const backgroundNoise = REMOTE && /Failed to load resource|net::ERR_|favicon/.test(text);
+    if (!backgroundNoise) problems.push('log: ' + text.slice(0, 160));
   }
 });
 await new Promise((r) => ws.addEventListener('open', r));
@@ -111,7 +121,7 @@ const check = (name, pass, detail = '') => {
 };
 
 /* =============================== the run =================================== */
-await send('Page.navigate', { url: `http://127.0.0.1:${PORT}/index.html` });
+await send('Page.navigate', { url: PAGE });
 await sleep(2000);
 
 console.log('\n1. the title card');
@@ -244,6 +254,7 @@ problems.forEach((p) => console.log('   ' + p));
 const failed = results.filter((r) => !r.pass);
 console.log(`\n${failed.length || problems.length ? 'FAIL' : 'PASS'}: ${results.length} checks, ${failed.length} failed, ${problems.length} browser problems`);
 failed.forEach((f) => console.log('   x ' + f.name + '  [' + f.detail + ']'));
+console.log('checked: ' + PAGE);
 console.log('screenshots: ' + OUT);
 ws.close();
 kill();

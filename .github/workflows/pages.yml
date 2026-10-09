@@ -1,0 +1,53 @@
+# Publishes the built game to GitHub Pages.
+#
+# This workflow has to exist because Pages cannot serve this repo's source tree:
+# the index.html at the repo root is the Vite template, and a browser has no idea
+# what to do with `<script src="/src/main.jsx">` — JSX and bare imports cannot be
+# fetched, so the published page comes up blank. So CI builds it, runs the checks,
+# and uploads dist/ as the site.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      # also points the repo's Pages source at GitHub Actions if it isn't already
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

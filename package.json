@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:browser": "vite build && node tests/browser.mjs dist"
+    "test:browser": "vite build && node tests/browser.mjs dist",
+    "test:live": "node tests/browser.mjs https://morattiyau-ctrlww.github.io/sailor/"
   },
   "dependencies": {
     "framer-motion": "^14.0.0",
