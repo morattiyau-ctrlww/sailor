@@ -14,11 +14,15 @@ npm install
 npm run dev            # 開發伺服器
 npm test               # 59 個純邏輯/音效測試（Node，不需要瀏覽器）
 npm run test:browser   # 37 項瀏覽器實測（headless Chrome，會存截圖）
+npm run test:live      # 同樣 37 項，但打線上那一份
 ```
 
-> **線上版**：`gh-pages` 分支已放好打包好的成品（相對路徑，可掛在 `/sailor/` 之下）。
-> 只要在 GitHub 的 Settings → Pages 把 Source 指到 `gh-pages` /`(root)`，
-> 就會在 <https://morattiyau-ctrlww.github.io/sailor/> 上線。
+> **線上版**：<https://morattiyau-ctrlww.github.io/sailor/> —— 每次 push 到 `main`，
+> `.github/workflows/pages.yml` 就建置 `dist/`、跑 lint 與 59 個測試，再上傳給 Pages。
+>
+> 注意 Pages **不能**直接發佈這個 repo 的根目錄：根目錄那份 `index.html` 是 Vite 的樣板，
+> 裡面寫著 `src="/src/main.jsx"`——瀏覽器拿到 JSX 與裸 import 沒辦法執行，結果會是
+> 「建置成功、部署成功、打開一片空白」。所以一定要發佈打包過的 `dist/`。
 
 三次連拍：你的回合 → 結算鎖定 → 敵人的回合（都是 headless Chrome 實測截圖）
 
@@ -139,6 +143,10 @@ AudioContext——這也是整場唯一的技術性限制。
 - 全程 **0 個 console 錯誤、0 個例外**
 
 截圖會存在 `/tmp/sailor/`（`01-start` … `07-phone`）。
+
+`npm run test:live` 把同一套 37 項直接打向線上那份
+（<https://morattiyau-ctrlww.github.io/sailor/>）：實測同樣 **37/37**，交鋒 21 次後勝利、
+手機尺寸沒有溢出、0 個 console 錯誤——證明網站上跑的是打包過的成品，不是原始碼。
 
 ---
 
