@@ -8,8 +8,8 @@
    the exchange id, so one blow is one animation and a slow-motion replay of the
    same frame is impossible.
    ========================================================================= */
-import { useEffect, useMemo, useRef } from 'react';
-import { AnimatePresence, motion, useAnimationControls } from 'framer-motion';
+import { useMemo } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Ship from './Ship.jsx';
 import Pirate from './Pirate.jsx';
 import DamagePopup from './DamagePopup.jsx';
@@ -128,11 +128,11 @@ function Fighter({ side, state, hoverPart }) {
   const struck = mid && fx.actor === side;
   const took = mid && fx.target === side;
 
-  /* Your man steps toward the enemy; the enemy steps toward you. The step is a
-     percentage of the ship, so the lunge stays in proportion on any screen. */
+  /* The hulls never move. Only the men do: each one stands on the deck line
+     between the two ships, and steps toward his opponent when he strikes. */
   const toward = isPlayer ? 1 : -1;
   const step = struck
-    ? (fx.attackName === '下部力劈' ? 23 : fx.attackName === '虛招' ? 5 : 16)
+    ? (fx.attackName === '下部力劈' ? 14 : fx.attackName === '虛招' ? 4 : 10)
     : 0;
 
   return (
@@ -145,46 +145,41 @@ function Fighter({ side, state, hoverPart }) {
       }`}
       style={{ aspectRatio: '340 / 230' }}
     >
+      {/* the hull: fixed, never animated */}
+      <Ship
+        palette={isPlayer ? 'royal' : 'corsair'}
+        facing={isPlayer ? 1 : -1}
+        className="block h-full w-full drop-shadow-[0_18px_28px_rgba(0,0,0,0.55)]"
+      />
+
+      {/* the man, standing on the deck line between the two ships. He is the
+          only thing that moves: a short step toward the enemy on a strike. */}
       <motion.div
-        className="relative"
+        className={`absolute bottom-[35%] w-[19%] ${isPlayer ? 'left-[78%]' : 'left-[22%]'}`}
         animate={{ x: `${toward * step}%`, y: struck ? -5 : 0 }}
         transition={{ type: 'spring', stiffness: 220, damping: 15 }}
       >
-        {/* the hull itself gives when it takes a blow */}
-        <motion.div animate={took ? { x: toward * -13 } : { x: 0 }} transition={{ duration: 0.5 }}>
-          <Ship
-            palette={isPlayer ? 'royal' : 'corsair'}
-            facing={isPlayer ? 1 : -1}
-            className="block h-full w-full drop-shadow-[0_18px_28px_rgba(0,0,0,0.55)]"
-          />
-        </motion.div>
-
-        {/* the man, anchored inside the ship box so he scales with the hull,
-            with his feet on the deck planks. Both fighters share the same
-            deck line (bottom-[35%] of the hull box) so their feet line up. */}
-        <div className={`absolute bottom-[35%] w-[19%] ${isPlayer ? 'left-[78%]' : 'left-[22%]'}`}>
-          <Pirate
-            palette={isPlayer ? 'royal' : 'corsair'}
-            facing={isPlayer ? 1 : -1}
-            pose={pose}
-            zone={zone?.part || null}
-            zoneTone={zone?.tone || 'danger'}
-            glow={!isPlayer && state.phase === PHASE.ENEMY_ATTACK ? 1 : 0}
-            className="block h-auto w-full"
-          />
-        </div>
-
-        {/* a slack rope, so the two hulls read as lashed together */}
-        {isPlayer && (
-          <div className="rope pointer-events-none absolute bottom-[30%] left-[82%] h-[3px] w-[42%] rotate-[-3deg] opacity-75" />
-        )}
-
-        {/* the number, thrown off the man who took the blow */}
-        <DamagePopup
-          fx={took ? fx : null}
-          className={isPlayer ? 'right-0 bottom-[62%]' : 'bottom-[62%] left-[6%]'}
+        <Pirate
+          palette={isPlayer ? 'royal' : 'corsair'}
+          facing={isPlayer ? 1 : -1}
+          pose={pose}
+          zone={zone?.part || null}
+          zoneTone={zone?.tone || 'danger'}
+          glow={!isPlayer && state.phase === PHASE.ENEMY_ATTACK ? 1 : 0}
+          className="block h-auto w-full"
         />
       </motion.div>
+
+      {/* a slack rope, so the two hulls read as lashed together */}
+      {isPlayer && (
+        <div className="rope pointer-events-none absolute bottom-[30%] left-[82%] h-[3px] w-[42%] rotate-[-3deg] opacity-75" />
+      )}
+
+      {/* the number, thrown off the man who took the blow */}
+      <DamagePopup
+        fx={took ? fx : null}
+        className={isPlayer ? 'right-0 bottom-[62%]' : 'bottom-[62%] left-[6%]'}
+      />
     </div>
   );
 }
@@ -246,22 +241,10 @@ function SlashArc({ fx }) {
 
 /* ============================== the stage ================================= */
 export default function BattleScene({ state, hoverPart = null }) {
-  const shake = useAnimationControls();
-  const lastFx = useRef(0);
   const fx = state.fx;
 
-  /* One shake per exchange, and its size is the size of the blow. */
-  useEffect(() => {
-    if (!fx || lastFx.current === fx.id) return;
-    lastFx.current = fx.id;
-    const power = Math.min(1, (fx.damage || 0) / 30);
-    const amp = fx.outcome === 'block' ? 5 : fx.outcome === 'miss' ? 3 : 9 + power * 13;
-    shake.start({
-      x: [0, -amp, amp * 0.7, -amp * 0.45, amp * 0.2, 0],
-      y: [0, amp * 0.4, -amp * 0.3, amp * 0.18, 0, 0],
-      transition: { duration: 0.52, ease: 'easeOut' },
-    });
-  }, [fx, shake]);
+  /* The stage itself stays still — the ships are lashed together and do not
+     rock. The only motion is the men and the sparks. */
 
   const playerHit = fx && state.phase === PHASE.RESOLVING && fx.target === 'player' && fx.outcome === 'hit';
 
@@ -271,13 +254,13 @@ export default function BattleScene({ state, hoverPart = null }) {
       {/* The stage band leaves room for the HUD at the foot of the screen, so
           the hulls are never buried behind the log. A phone spends more of its
           height on buttons, so the band gives up more there. */}
-      <motion.div className="absolute inset-x-0 top-0 bottom-[44vh] lg:bottom-[31vh]" animate={shake}>
+      <div className="absolute inset-x-0 top-0 bottom-[44vh] lg:bottom-[31vh]">
         <Sea />
         <Fighter side="player" state={state} hoverPart={hoverPart} />
         <Fighter side="enemy" state={state} hoverPart={hoverPart} />
         <SlashArc fx={fx} />
         <Sparks fx={fx} />
-      </motion.div>
+      </div>
 
       {/* taking one hurts */}
       <AnimatePresence>
