@@ -12,10 +12,10 @@ import { hpPercent } from '../game/reducer.js';
 function GearRow({ icon, item, value }) {
   return (
     <div className="flex items-baseline gap-1.5 text-[11px] leading-tight">
-      <span className="w-4 shrink-0 text-center opacity-80">{icon}</span>
-      <span className="truncate font-semibold text-parch-100">{item.name}</span>
+      <span className="emoji-aged w-4 shrink-0 text-center opacity-90">{icon}</span>
+      <span className="truncate font-semibold tracking-wide text-parch-100">{item.name}</span>
       {value ? (
-        <span className="ml-auto shrink-0 text-[10px] tabular-nums text-gold-bright/95">{value}</span>
+        <span className="ml-auto shrink-0 text-[10px] tabular-nums tracking-wider text-brass-light/95">{value}</span>
       ) : null}
     </div>
   );
@@ -37,7 +37,7 @@ export default function UIPanel({ side, state, charging = false, hit = false }) 
     >
       <div className="flex gap-2 sm:gap-2.5">
         {/* portrait */}
-        <div className="relative h-[52px] w-[42px] shrink-0 overflow-hidden rounded-md border border-brass/70 bg-sea-900/70 sm:h-[68px] sm:w-[54px]">
+        <div className="relative h-[52px] w-[42px] shrink-0 overflow-hidden rounded-sm border-2 border-wood-dark bg-sea-900/70 shadow-[inset_0_0_12px_rgba(0,0,0,0.7)] outline outline-1 outline-brass/60 outline-offset-[-3px] sm:h-[68px] sm:w-[54px]">
           <Pirate
             palette={me ? 'royal' : 'corsair'}
             facing={me ? 1 : -1}
@@ -48,17 +48,17 @@ export default function UIPanel({ side, state, charging = false, hit = false }) 
 
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2">
-            <span className={`truncate text-[13px] font-bold ${me ? 'text-royal' : 'text-corsair'}`}>
+            <span className={`truncate text-[13px] font-bold tracking-widest ${me ? 'text-royal' : 'text-corsair'}`}>
               {gear.title}
             </span>
             {offBalance && (
-              <span className="shrink-0 rounded bg-amber-500/25 px-1 text-[9px] font-bold text-amber-200">門戶大開</span>
+              <span className="shrink-0 rounded-sm border border-amber-500/60 bg-amber-500/25 px-1 text-[9px] font-bold tracking-wider text-amber-200">門戶大開</span>
             )}
           </div>
-          <div className="text-[10px] tracking-[0.2em] text-parch-300/80">「{gear.ship}」</div>
+          <div className="text-[10px] tracking-[0.3em] text-parch-300/80">「{gear.ship}」</div>
 
           {/* health */}
-          <div className="relative mt-1.5 h-[16px] w-full overflow-hidden rounded hp-track">
+          <div className="relative mt-1.5 h-[16px] w-full overflow-hidden rounded-sm hp-track">
             <div className="hp-ghost absolute inset-y-0 left-0" style={{ width: `${pct}%` }} />
             <motion.div
               className={`absolute inset-y-0 left-0 hp-fill ${me ? 'hp-fill-good' : ''}`}
@@ -68,10 +68,10 @@ export default function UIPanel({ side, state, charging = false, hit = false }) 
             />
             <div className="hp-ticks pointer-events-none absolute inset-0 opacity-40" />
             <div className="absolute inset-0 flex items-center justify-between px-1.5">
-              <span className="text-[9px] font-bold tracking-wider text-parchment/90">
+              <span className="text-[9px] font-bold tracking-[0.2em] text-parchment/90">
                 {me ? '船長' : '海盜'}
               </span>
-              <span className={`text-[10px] font-bold tabular-nums ${low ? 'text-red-200' : 'text-parchment'}`}>
+              <span className={`text-[10px] font-bold tabular-nums tracking-wider ${low ? 'text-red-200' : 'text-parchment'}`}>
                 {hp} / {state.maxHp}
               </span>
             </div>

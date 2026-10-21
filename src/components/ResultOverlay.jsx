@@ -40,21 +40,21 @@ export default function ResultOverlay({ state, onRestart }) {
           />
         </div>
         <h2
-          className={`text-shadow-hard mt-1 text-[40px] font-black tracking-[0.2em] ${
-            won ? 'text-gold-bright' : 'text-blood-bright'
+          className={`text-shadow-hard mt-1 border-b-4 border-double border-brass pb-2 text-[40px] font-black tracking-[0.2em] ${
+            won ? 'text-brass-light' : 'text-blood-bright'
           }`}
         >
           {won ? '勝利' : '戰敗'}
         </h2>
-        <p className="mt-1 text-[12px] tracking-[0.2em] text-parch-200">
+        <p className="mt-1 text-[12px] tracking-[0.3em] text-parch-200">
           {won ? '紅鬍子倒在甲板上，海鴉號降下旗來。' : '你被拖上桅杆，海圖換了主人。'}
         </p>
 
-        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5 rounded-md border border-brass/60 bg-wood-950/50 px-3 py-2.5 text-left text-[12px]">
+        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5 rounded-sm border-2 border-brass/60 bg-wood-dark/70 px-3 py-2.5 text-left text-[12px] shadow-[inset_0_0_18px_rgba(0,0,0,0.5)]">
           {rows.map(([k, v]) => (
             <div key={k} className="flex items-baseline justify-between gap-2">
-              <dt className="text-parch-300/90">{k}</dt>
-              <dd className="font-bold tabular-nums text-parchment">{v}</dd>
+              <dt className="tracking-wider text-parch-300/90">{k}</dt>
+              <dd className="font-bold tabular-nums tracking-wider text-parchment">{v}</dd>
             </div>
           ))}
         </dl>
@@ -64,11 +64,11 @@ export default function ResultOverlay({ state, onRestart }) {
           onClick={onRestart}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="brass-plate mt-4 w-full rounded-lg px-4 py-3 text-[16px] font-black tracking-[0.28em]"
+          className="brass-plate mt-4 w-full rounded-sm px-4 py-3 text-[16px] font-black tracking-[0.28em]"
         >
-          ⚔ 再來一場
+          <span className="emoji-aged">⚔</span> 再來一場
         </motion.button>
-        <p className="mt-2 text-[10px] text-parch-300/75">或按 R 鍵重開</p>
+        <p className="mt-2 text-[10px] tracking-widest text-parch-300/75">或按 R 鍵重開</p>
       </motion.div>
     </motion.div>
   );

@@ -27,17 +27,17 @@ function Plate({ kind, title, part, tag, note, onClick, disabled }) {
       aria-label={title}
     >
       <div className="flex items-center gap-2">
-        <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[12px] ${attack ? 'bg-gold/25 text-gold-bright' : 'bg-sky-300/20 text-sky-100'}`}>
+        <span className={`emoji-aged grid h-6 w-6 shrink-0 place-items-center rounded-sm border text-[12px] ${attack ? 'border-brass/70 bg-wood-dark/60 text-brass-light' : 'border-brass/70 bg-wood-dark/60 text-brass-light'}`}>
           {PART_ICON[part] || '✹'}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-[14px] font-bold leading-tight">{title}</span>
-          <span className="block truncate text-[10.5px] leading-tight opacity-80">
+          <span className="block truncate text-[14px] font-bold leading-tight tracking-widest">{title}</span>
+          <span className="block truncate text-[10.5px] leading-tight tracking-wider opacity-80">
             {part ? `${PART_LABEL[part]} · ` : ''}{tag}
           </span>
         </span>
       </div>
-      {note ? <div className="mt-1 truncate text-[10px] italic opacity-65">{note}</div> : null}
+      {note ? <div className="mt-1 truncate text-[10px] italic tracking-wide opacity-65">{note}</div> : null}
     </motion.button>
   );
 }
@@ -57,10 +57,10 @@ export default function ActionBar({ state, onAttack, onDefence, onHoverPart }) {
     <div className="flex min-h-0 flex-col gap-2">
       <div className={`wood flex items-center justify-between px-3 py-1.5 ${locked ? '' : 'animate-pulse-gold'}`}>
         <div>
-          <div className={`text-[14px] font-bold leading-tight ${header.tone}`}>{header.title}</div>
-          <div className="text-[10px] tracking-[0.16em] text-parch-200/85">{header.sub}</div>
+          <div className={`text-[14px] font-bold leading-tight tracking-widest ${header.tone}`}>{header.title}</div>
+          <div className="text-[10px] tracking-[0.3em] text-parch-200/85">{header.sub}</div>
         </div>
-        <div className="brass-plate rounded px-2 py-1 text-[11px] font-bold tabular-nums">
+        <div className="brass-plate rounded-sm px-2 py-1 text-[11px] font-bold tabular-nums tracking-widest">
           第 {state.turn} 回合
         </div>
       </div>
@@ -101,10 +101,10 @@ export default function ActionBar({ state, onAttack, onDefence, onHoverPart }) {
             key="locked"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="col-span-2 grid place-items-center rounded border border-gold/40 bg-wood-950/70 px-3 py-4 text-center sm:col-span-4"
+            className="col-span-2 grid place-items-center rounded-sm border-2 border-brass/60 bg-wood-dark/80 px-3 py-4 text-center shadow-[inset_0_0_25px_rgba(62,39,35,0.6)] sm:col-span-4"
           >
-            <div className="text-[13px] font-bold text-gold-bright">⚔ 刀光劍影，按鍵已鎖定 ⚔</div>
-            <div className="mt-0.5 text-[10.5px] text-parch-300/80">
+            <div className="text-[13px] font-bold tracking-widest text-brass-light"><span className="emoji-aged">⚔</span> 刀光劍影，按鍵已鎖定 <span className="emoji-aged">⚔</span></div>
+            <div className="mt-0.5 text-[10.5px] tracking-wider text-parch-300/80">
               {state.pending?.actor === 'player' ? '你的攻勢正在落下' : '敵人的刀正朝你招呼過來'}
             </div>
           </motion.div>

@@ -23,10 +23,10 @@ export default function BattleLog({ log, tally, settled, className = '' }) {
   }, [log.length]);
 
   return (
-    <section className={`parchment flex min-h-0 flex-col rounded-lg ${className}`}>
-      <header className="flex items-center justify-between border-b border-brass/50 px-3 py-1.5">
-        <h2 className="text-[12px] font-bold tracking-[0.28em] text-amber-900">航海日誌</h2>
-        <span className="text-[10px] tabular-nums text-amber-800/80">交鋒 {settled} 次</span>
+    <section className={`parchment flex min-h-0 flex-col rounded-sm ${className}`}>
+      <header className="flex items-center justify-between border-b-2 border-double border-brass/70 px-3 py-1.5">
+        <h2 className="text-[12px] font-bold tracking-[0.3em] text-wood-dark">航海日誌</h2>
+        <span className="text-[10px] tabular-nums tracking-wider text-amber-800/80">交鋒 {settled} 次</span>
       </header>
 
       <ol className="log-scroll min-h-0 flex-1 space-y-1 overflow-y-auto px-3 py-2 text-[11.5px] leading-snug">
@@ -45,14 +45,14 @@ export default function BattleLog({ log, tally, settled, className = '' }) {
         <li ref={endRef} />
       </ol>
 
-      <footer className="grid grid-cols-5 border-t border-brass/50 px-2 py-1.5 text-center text-[10px] text-amber-900/90">
+      <footer className="grid grid-cols-5 border-t-2 border-double border-brass/70 px-2 py-1.5 text-center text-[10px] text-amber-900/90">
         {[
           ['命中', tally.hits], ['格擋', tally.blocks], ['落空', tally.misses],
           ['你造成', tally.dealt], ['你承受', tally.taken],
         ].map(([label, value]) => (
           <div key={label}>
-            <div className="font-bold tabular-nums">{value}</div>
-            <div className="text-[9px] opacity-70">{label}</div>
+            <div className="font-bold tabular-nums tracking-wider">{value}</div>
+            <div className="text-[9px] tracking-widest opacity-70">{label}</div>
           </div>
         ))}
       </footer>
