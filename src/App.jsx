@@ -40,6 +40,7 @@ export default function App() {
   const { state, audio, begin, restart, chooseAttack, chooseDefence, toggleMute } = useBattle();
   const [hoverPart, setHoverPart] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [logOpen, setLogOpen] = useState(false);
 
   const onBegin = useCallback(async () => {
     setBusy(true);
@@ -81,14 +82,16 @@ export default function App() {
         />
       </div>
 
-      {/* ---------------- bottom: the log and the plates ---------------- */}
+      {/* ---------------- bottom: the log (on demand) and the plates ---------------- */}
       <div className="absolute inset-x-0 bottom-0 z-20 grid gap-2 p-2 sm:gap-3 sm:p-3 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
-        <BattleLog
-          log={state.log}
-          tally={state.tally}
-          settled={state.settled}
-          className="h-[16vh] min-h-[104px] lg:h-[30vh]"
-        />
+        {logOpen && (
+          <BattleLog
+            log={state.log}
+            tally={state.tally}
+            settled={state.settled}
+            className="h-[16vh] min-h-[104px] lg:h-[30vh]"
+          />
+        )}
         <ActionBar
           state={state}
           onAttack={chooseAttack}
@@ -96,6 +99,18 @@ export default function App() {
           onHoverPart={setHoverPart}
         />
       </div>
+
+      {/* ---------------- the log toggle ---------------- */}
+      {state.phase !== PHASE.INTRO && (
+        <button
+          type="button"
+          onClick={() => setLogOpen((v) => !v)}
+          aria-pressed={logOpen}
+          className="brass-plate absolute bottom-[calc(30vh+1.5rem)] left-3 z-30 hidden rounded-sm px-2.5 py-1.5 text-[11px] font-bold tracking-widest lg:block"
+        >
+          {logOpen ? '收起日誌' : '航海日誌'}
+        </button>
+      )}
 
       {/* ---------------- overlays ---------------- */}
       <AnimatePresence>

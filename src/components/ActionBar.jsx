@@ -47,11 +47,13 @@ export default function ActionBar({ state, onAttack, onDefence, onHoverPart }) {
   const attackPhase = state.phase === PHASE.PLAYER_ATTACK;
   const defendPhase = state.phase === PHASE.ENEMY_ATTACK;
 
+  /* Nothing to choose while a blow is resolving, or once the fight is over:
+     the whole bar steps out of the way instead of showing dead buttons. */
+  if (!attackPhase && !defendPhase) return null;
+
   const header = attackPhase
     ? { title: '你的回合', sub: '選擇攻擊部位', tone: 'text-gold-bright' }
-    : defendPhase
-      ? { title: '敵人正在蓄勢待發！', sub: '選擇防守部位', tone: 'text-blood-bright animate-pulse' }
-      : { title: '刀鋒交錯', sub: '結算中，按鍵已鎖定', tone: 'text-parch-300' };
+    : { title: '敵人正在蓄勢待發！', sub: '選擇防守部位', tone: 'text-blood-bright animate-pulse' };
 
   return (
     <div className="flex min-h-0 flex-col gap-2">
@@ -95,20 +97,6 @@ export default function ActionBar({ state, onAttack, onDefence, onHoverPart }) {
             </motion.div>
           ))}
         </AnimatePresence>
-
-        {locked && (
-          <motion.div
-            key="locked"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="col-span-2 grid place-items-center rounded-sm border-2 border-brass/60 bg-wood-dark/80 px-3 py-4 text-center shadow-[inset_0_0_25px_rgba(62,39,35,0.6)] sm:col-span-4"
-          >
-            <div className="text-[13px] font-bold tracking-widest text-brass-light"><span className="emoji-aged">⚔</span> 刀光劍影，按鍵已鎖定 <span className="emoji-aged">⚔</span></div>
-            <div className="mt-0.5 text-[10.5px] tracking-wider text-parch-300/80">
-              {state.pending?.actor === 'player' ? '你的攻勢正在落下' : '敵人的刀正朝你招呼過來'}
-            </div>
-          </motion.div>
-        )}
       </div>
     </div>
   );
