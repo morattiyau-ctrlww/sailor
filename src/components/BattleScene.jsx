@@ -143,6 +143,7 @@ function Fighter({ side, state, hoverPart }) {
       className={`absolute bottom-[2%] w-[130%] lg:w-[44%] ${
         isPlayer ? 'left-[-80%] lg:left-[-1%]' : 'right-[-80%] lg:right-[-1%]'
       }`}
+      style={{ aspectRatio: '340 / 230' }}
     >
       <motion.div
         className="relative"
@@ -154,12 +155,13 @@ function Fighter({ side, state, hoverPart }) {
           <Ship
             palette={isPlayer ? 'royal' : 'corsair'}
             facing={isPlayer ? 1 : -1}
-            className="h-auto w-full drop-shadow-[0_18px_28px_rgba(0,0,0,0.55)]"
+            className="block h-full w-full drop-shadow-[0_18px_28px_rgba(0,0,0,0.55)]"
           />
         </motion.div>
 
         {/* the man, anchored inside the ship box so he scales with the hull,
-            with his feet on the deck planks */}
+            with his feet on the deck planks. Both fighters share the same
+            deck line (bottom-[35%] of the hull box) so their feet line up. */}
         <div className={`absolute bottom-[35%] w-[19%] ${isPlayer ? 'left-[78%]' : 'left-[22%]'}`}>
           <Pirate
             palette={isPlayer ? 'royal' : 'corsair'}
@@ -168,7 +170,7 @@ function Fighter({ side, state, hoverPart }) {
             zone={zone?.part || null}
             zoneTone={zone?.tone || 'danger'}
             glow={!isPlayer && state.phase === PHASE.ENEMY_ATTACK ? 1 : 0}
-            className="w-full"
+            className="block h-auto w-full"
           />
         </div>
 
