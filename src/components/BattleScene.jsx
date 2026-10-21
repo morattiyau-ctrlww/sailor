@@ -180,6 +180,11 @@ function Sailor({ side, state, hoverPart }) {
       animate={{ x: `${toward * step}%`, y: struck ? -5 : 0 }}
       transition={{ type: 'spring', stiffness: 220, damping: 15 }}
     >
+      {/* the deck plank under his feet, so he stands on something */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-[-18%] bottom-[-6px] h-[10px] rounded-[2px] border border-[#2a1a0e] bg-[repeating-linear-gradient(90deg,#5d4037_0px,#4e3119_3px,#654020_6px,#3e2723_9px,#5d4037_12px)] shadow-[0_4px_8px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,214,150,0.25)]"
+      />
       <Pirate
         palette={isPlayer ? 'royal' : 'corsair'}
         facing={isPlayer ? 1 : -1}
@@ -187,7 +192,7 @@ function Sailor({ side, state, hoverPart }) {
         zone={zone?.part || null}
         zoneTone={zone?.tone || 'danger'}
         glow={!isPlayer && state.phase === PHASE.ENEMY_ATTACK ? 1 : 0}
-        className="block h-auto w-full"
+        className="relative block h-auto w-full"
       />
     </motion.div>
   );
