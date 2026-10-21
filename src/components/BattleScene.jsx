@@ -118,22 +118,12 @@ function Sky() {
 }
 
 
-/* ---- one side of the fight: a ship with a man on its deck ---------------- */
-function Fighter({ side, state, hoverPart }) {
+/* ---- one side of the fight: a ship, fixed in place ---------------------- */
+function Fighter({ side, state }) {
   const isPlayer = side === 'player';
-  const pose = poseFor(side, state);
-  const zone = zoneFor(side, state, hoverPart);
   const fx = state.fx;
   const mid = state.phase === PHASE.RESOLVING && fx;
-  const struck = mid && fx.actor === side;
   const took = mid && fx.target === side;
-
-  /* The hulls never move. Only the men do: each one stands on the deck line
-     between the two ships, and steps toward his opponent when he strikes. */
-  const toward = isPlayer ? 1 : -1;
-  const step = struck
-    ? (fx.attackName === '下部力劈' ? 14 : fx.attackName === '虛招' ? 4 : 10)
-    : 0;
 
   return (
     /* The hull is 130% of the viewport wide on a phone, so the two ships still
@@ -152,24 +142,6 @@ function Fighter({ side, state, hoverPart }) {
         className="block h-full w-full drop-shadow-[0_18px_28px_rgba(0,0,0,0.55)]"
       />
 
-      {/* the man, standing on the deck line between the two ships. He is the
-          only thing that moves: a short step toward the enemy on a strike. */}
-      <motion.div
-        className={`absolute bottom-[35%] w-[19%] ${isPlayer ? 'left-[78%]' : 'left-[22%]'}`}
-        animate={{ x: `${toward * step}%`, y: struck ? -5 : 0 }}
-        transition={{ type: 'spring', stiffness: 220, damping: 15 }}
-      >
-        <Pirate
-          palette={isPlayer ? 'royal' : 'corsair'}
-          facing={isPlayer ? 1 : -1}
-          pose={pose}
-          zone={zone?.part || null}
-          zoneTone={zone?.tone || 'danger'}
-          glow={!isPlayer && state.phase === PHASE.ENEMY_ATTACK ? 1 : 0}
-          className="block h-auto w-full"
-        />
-      </motion.div>
-
       {/* a slack rope, so the two hulls read as lashed together */}
       {isPlayer && (
         <div className="rope pointer-events-none absolute bottom-[30%] left-[82%] h-[3px] w-[42%] rotate-[-3deg] opacity-75" />
@@ -181,6 +153,43 @@ function Fighter({ side, state, hoverPart }) {
         className={isPlayer ? 'right-0 bottom-[62%]' : 'bottom-[62%] left-[6%]'}
       />
     </div>
+  );
+}
+
+/* ---- the two men, standing on the line between the hulls ---------------- */
+function Sailor({ side, state, hoverPart }) {
+  const isPlayer = side === 'player';
+  const pose = poseFor(side, state);
+  const zone = zoneFor(side, state, hoverPart);
+  const fx = state.fx;
+  const mid = state.phase === PHASE.RESOLVING && fx;
+  const struck = mid && fx.actor === side;
+
+  /* The hulls never move. Only the men do: each one stands on the deck line
+     between the two ships, and steps toward his opponent when he strikes. */
+  const toward = isPlayer ? 1 : -1;
+  const step = struck
+    ? (fx.attackName === '下部力劈' ? 14 : fx.attackName === '虛招' ? 4 : 10)
+    : 0;
+
+  return (
+    <motion.div
+      className={`absolute bottom-[calc(2%+35%*0.44)] w-[10%] max-w-[120px] ${
+        isPlayer ? 'left-[42%]' : 'right-[42%]'
+      }`}
+      animate={{ x: `${toward * step}%`, y: struck ? -5 : 0 }}
+      transition={{ type: 'spring', stiffness: 220, damping: 15 }}
+    >
+      <Pirate
+        palette={isPlayer ? 'royal' : 'corsair'}
+        facing={isPlayer ? 1 : -1}
+        pose={pose}
+        zone={zone?.part || null}
+        zoneTone={zone?.tone || 'danger'}
+        glow={!isPlayer && state.phase === PHASE.ENEMY_ATTACK ? 1 : 0}
+        className="block h-auto w-full"
+      />
+    </motion.div>
   );
 }
 
@@ -256,8 +265,10 @@ export default function BattleScene({ state, hoverPart = null }) {
           height on buttons, so the band gives up more there. */}
       <div className="absolute inset-x-0 top-0 bottom-[44vh] lg:bottom-[31vh]">
         <Sea />
-        <Fighter side="player" state={state} hoverPart={hoverPart} />
-        <Fighter side="enemy" state={state} hoverPart={hoverPart} />
+        <Fighter side="player" state={state} />
+        <Fighter side="enemy" state={state} />
+        <Sailor side="player" state={state} hoverPart={hoverPart} />
+        <Sailor side="enemy" state={state} hoverPart={hoverPart} />
         <SlashArc fx={fx} />
         <Sparks fx={fx} />
       </div>
